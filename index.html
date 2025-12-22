@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hrigved Suryawanshi | Robotics Engineer</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;800&display=swap');
+
+        :root {
+            --bg-color: #050505;
+            --glass-bg: rgba(12, 12, 15, 0.95);
+            --glass-strong: rgba(5, 5, 5, 0.98);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --accent-cyan: #22d3ee;
+            --text-main: #ffffff;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            background-color: #050505;
+        }
+
+        /* --- NAV BAR --- */
+        nav {
+            backdrop-filter: blur(16px);
+            background: rgba(5, 5, 5, 0.9);
+            border-bottom: 1px solid var(--glass-border);
+            height: 70px;
+            transition: all 0.3s;
+        }
+
+        .terminal-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .prompt-sign {
+            color: #4ade80;
+            margin-right: 8px;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.1rem;
+            background-color: var(--accent-cyan);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .nav-link {
+            font-family: 'JetBrains Mono', monospace;
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.4);
+        }
+
+        .highlight-text {
+            background: linear-gradient(90deg, var(--accent-cyan), #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- UNIFIED CARD CONTAINER --- */
+        .unified-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .section-wrapper {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(8px);
+            margin-bottom: 3rem;
+        }
+
+        /* Internal Rows */
+        .drawer-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: background-color 0.2s ease;
+        }
+
+        .drawer-item:last-child {
+            border-bottom: none;
+        }
+
+        .drawer-item:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .drawer-header {
+            padding: 2.5rem 2.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-content {
+            max-height: 0;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .drawer-item.active .drawer-content {
+            max-height: 1000px;
+            opacity: 1;
+        }
+
+        .drawer-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .drawer-item.active .drawer-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Fullscreen Overlays */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--glass-strong);
+            z-index: 100;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1);
+            overflow-y: auto;
+        }
+
+        .fullscreen-overlay.open {
+            transform: translateY(0);
+        }
+
+        .close-btn {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            font-size: 2.5rem;
+            color: white;
+            cursor: pointer;
+            z-index: 101;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Typography Utilities */
+        .tech-font {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .prompt {
+            color: var(--accent-cyan);
+            margin-right: 8px;
+            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .cyber-link {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-cyan);
+            transition: all 0.2s;
+        }
+
+        .cyber-link:hover {
+            background: rgba(34, 211, 238, 0.1);
+        }
+
+        .section-anchor {
+            scroll-margin-top: 100px;
+        }
+
+        .section-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-cyan);
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        /* Footer styles removed/reset inline for static layout */
+        .img-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            border-radius: 8px;
+            border: 1px dashed #475569;
+            transition: border-color 0.3s;
+        }
+
+        .drawer-item:hover .img-placeholder {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .typewriter-cursor::after {
+            content: '_';
+            animation: blink 1s infinite;
+            color: var(--accent-cyan);
+        }
+
+        /* Telemetry HUD */
+        #telemetry-panel {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 280px;
+            background: rgba(10, 10, 15, 0.95);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 4px;
+            padding: 15px;
+            z-index: 45;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .telemetry-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22d3ee;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(34, 211, 238, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 211, 238, 0);
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <div id="canvas-container"></div>
+
+    <nav class="fixed w-full z-50 px-8 flex justify-between items-center text-white">
+        <div class="terminal-logo">
+            <span class="prompt-sign">hrigved@suryawanshi:~$</span>cat profile<span class="cursor"></span>
+        </div>
+        <div class="hidden md:flex space-x-12">
+            <a href="#about" class="nav-link">~/ABOUT</a>
+            <a href="#experience" class="nav-link">~/EXPERIENCE</a>
+            <a href="#projects" class="nav-link">~/PROJECTS</a>
+            <button onclick="openOverlay('education')" class="nav-link">~/EDUCATION</button>
+            <button onclick="openOverlay('interests')" class="nav-link">~/INTERESTS</button>
+        </div>
+    </nav>
+
+    <div id="telemetry-panel">
+        <div class="border-b border-gray-700 pb-2 mb-2 flex justify-between items-center">
+            <span class="font-bold text-white">/odom_monitor</span>
+            <span class="status-dot"></span>
+        </div>
+        <div class="telemetry-row"><span class="text-gray-500">frame_id:</span><span class="text-xs">map</span></div>
+        <div class="telemetry-row"><span class="text-gray-500">pos_x:</span><span id="tel-x"
+                class="text-cyan-400">0.00</span></div>
+        <div class="telemetry-row"><span class="text-gray-500">pos_y:</span><span id="tel-y"
+                class="text-cyan-400">0.00</span></div>
+        <div class="telemetry-row"><span class="text-gray-500">pos_z:</span><span id="tel-z"
+                class="text-cyan-400">0.00</span></div>
+        <div class="telemetry-row mt-2 border-t border-gray-800 pt-1"><span
+                class="text-gray-500">perception:</span><span id="tel-target" class="text-yellow-400">SCANNING</span>
+        </div>
+        <div class="telemetry-row"><span class="text-gray-500">mode:</span><span id="tel-mode"
+                class="text-purple-400">AERIAL_LOITER</span></div>
+    </div>
+
+    <main class="relative container mx-auto px-6 md:px-12 pt-24 pb-40 z-10">
+
+        <section id="about" class="min-h-[80vh] flex flex-col justify-center mb-20 relative section-anchor">
+            <div class="max-w-xl">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-900/40 text-cyan-400 text-xs font-mono mb-6 backdrop-blur-md">
+                    <span class="relative flex h-2 w-2">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                    </span>
+                    SYSTEM: AUTONOMY ACTIVE
+                </div>
+
+                <h1
+                    class="text-6xl md:text-8xl font-extrabold mb-6 leading-tight tracking-tight text-white drop-shadow-xl">
+                    Hrigved <br>
+                    <span class="highlight-text type-target" data-text="Suryawanshi"></span>
+                </h1>
+
+                <p
+                    class="text-xl text-gray-200 font-normal leading-relaxed mb-8 p-8 rounded-xl bg-gray-900/90 border-l-4 border-cyan-500 backdrop-blur-md shadow-lg">
+                    <span class="text-cyan-400 font-bold">Robotics Engineer</span> specializing in Multimodal Systems,
+                    SLAM, Perception, and Planning
+                    <br><br>
+                    <span class="text-base text-gray-300">Developing robust state estimation and planning algorithms for
+                        unstructured environments</span>
+                </p>
+
+                <div class="flex flex-wrap gap-4">
+                    <a href="#projects"
+                        class="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-cyan-400 hover:text-white transition duration-300">Explore
+                        Work</a>
+                    <a href="Resume@Hrigved_suryawanshi.pdf" target="_blank"
+                        class="px-8 py-3 border border-gray-500 bg-black/70 backdrop-blur-md text-white rounded-full hover:bg-white/10 transition">Download
+                        CV</a>
+                </div>
+            </div>
+
+            <div id="scroll-indicator"
+                class="absolute bottom-10 right-10 hidden md:block text-right opacity-80 transition-opacity duration-500">
+                <p class="text-xs font-mono text-cyan-400 mb-2">SCROLL TO MORPH</p>
+                <div class="w-0.5 h-16 bg-gradient-to-b from-cyan-400 to-transparent mx-auto animate-pulse"></div>
+            </div>
+        </section>
+
+        <section id="experience" class="mb-32 section-anchor">
+            <div class="section-wrapper">
+                <h2 class="text-3xl font-bold mb-10 flex items-center gap-4 text-white">
+                    <span class="section-num">01.</span>
+                    <span class="type-target" data-text="Professional Experience"></span>
+                    <span class="h-px bg-gray-700 flex-grow"></span>
+                </h2>
+
+                <div class="unified-card">
+
+                    <div class="drawer-item" onclick="toggleDrawer(this)">
+                        <div class="drawer-header">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white group-hover:text-cyan-400 transition">Research
+                                    Assistant</h3>
+                                <div class="text-gray-400 mt-1 text-sm font-medium">
+                                    <span class="text-white font-bold text-lg">Silicon Synapse Lab</span> | Boston, MA |
+                                    Jun
+                                    2024 - Present
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-down drawer-icon text-gray-500"></i>
+                        </div>
+                        <div class="drawer-content">
+                            <div class="px-8 pb-8 flex flex-col md:flex-row gap-8">
+                                <div class="md:w-1/3">
+                                    <div class="img-placeholder">
+                                        <div class="text-center"><i class="fa-solid fa-robot text-4xl mb-3"></i><br>[Lab
+                                            Robot]</div>
+                                    </div>
+                                </div>
+                                <div class="md:w-2/3 text-gray-300 text-base leading-relaxed space-y-6 font-normal">
+                                    <div>
+                                        <h4 class="text-cyan-300 font-bold mb-2">M4 (Morphing Robot)</h4>
+                                        <ul class="list-none space-y-3">
+                                            <li><span class="prompt">></span> Developed ROS2 decision node with CNN
+                                                traversability estimator (89% accuracy)</li>
+                                            <li><span class="prompt">></span> Engineered elevation mapping fusing Livox
+                                                Mid-360 LiDAR & RealSense D455</li>
+                                            <li><span class="prompt">></span> Implemented NAV2/MAVROS integration for
+                                                6-second ground/aerial transitions</li>
+                                        </ul>
+                                    </div>
+                                    <div class="border-t border-gray-700 pt-4">
+                                        <h4 class="text-purple-300 font-bold mb-2">Cobra (Snake Robot)</h4>
+                                        <ul class="list-none space-y-3">
+                                            <li><span class="prompt">></span> Benchmarked SLAM (LIO-SAM vs RTAB-Map)
+                                                achieving 2cm accuracy</li>
+                                            <li><span class="prompt">></span> Processed 100k+ points/frame using PCL for
+                                                terrain analysis</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="drawer-item" onclick="toggleDrawer(this)">
+                        <div class="drawer-header">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">Deep Learning Engineer Intern</h3>
+                                <div class="text-gray-400 mt-1 text-sm font-medium">
+                                    <span class="text-white font-bold text-lg">FYNDME</span> | Boston, MA | Jan 2025 -
+                                    May
+                                    2025
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-down drawer-icon text-gray-500"></i>
+                        </div>
+                        <div class="drawer-content">
+                            <div class="px-8 pb-8 text-gray-300 text-base leading-relaxed font-normal">
+                                <ul class="list-none space-y-3">
+                                    <li><span class="prompt">></span> Improved face recognition accuracy (60% to 85%)
+                                        using
+                                        dual-layer anti-spoofing</li>
+                                    <li><span class="prompt">></span> Achieved 92% mAP for real-time SKU detection using
+                                        YOLOv8 across 500+ categories</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="drawer-item" onclick="toggleDrawer(this)">
+                        <div class="drawer-header">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">Embedded Systems Engineer</h3>
+                                <div class="text-gray-400 mt-1 text-sm font-medium">
+                                    <span class="text-white font-bold text-lg">VHIRON</span> | Mumbai, India | Oct 2022
+                                    -
+                                    Mar 2023
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-down drawer-icon text-gray-500"></i>
+                        </div>
+                        <div class="drawer-content">
+                            <div class="px-8 pb-8 text-gray-300 text-base leading-relaxed font-normal">
+                                <ul class="list-none space-y-3">
+                                    <li><span class="prompt">></span> Developed 3D photogrammetry scanner (0.1mm
+                                        resolution)
+                                        using Raspberry Pi</li>
+                                    <li><span class="prompt">></span> Constructed 18-inch CNC laser cutter with custom
+                                        G-code optimization</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+        </section>
+
+        <section id="projects" class="mb-20 section-anchor">
+            <div class="section-wrapper">
+                <h2 class="text-3xl font-bold mb-10 flex items-center gap-4 text-white">
+                    <span class="section-num">02.</span>
+                    <span class="type-target" data-text="Projects"></span>
+                    <span class="h-px bg-gray-700 flex-grow"></span>
+                </h2>
+
+                <div class="unified-card">
+
+                    <div class="drawer-item" onclick="toggleDrawer(this)">
+                        <div class="drawer-header">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">Autonomous AI Drone Platform</h3>
+                                <div class="flex gap-2 mt-2">
+                                    <span
+                                        class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">Jetson
+                                        Orin</span>
+                                    <span
+                                        class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">RTAB-Map</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-code-branch drawer-icon text-gray-500"></i>
+                        </div>
+                        <div class="drawer-content">
+                            <div class="px-8 pb-8 flex flex-col md:flex-row gap-6">
+                                <div class="md:w-1/3">
+                                    <div class="img-placeholder">[Drone Image]</div>
+                                </div>
+                                <div class="md:w-2/3 text-gray-300 text-base space-y-4 font-normal">
+                                    <p>Architected fully autonomous UAV with Pixhawk PX4 and Jetson Orin</p>
+                                    <ul class="list-none space-y-2 text-sm text-gray-400 font-mono">
+                                        <li>- EKF 9-axis IMU Fusion</li>
+                                        <li>- Orbbec Gemini Depth Avoidance</li>
+                                        <li>- ArUco Precision Landing</li>
+                                    </ul>
+                                    <a href="#" class="cyber-link text-sm font-mono font-bold mt-4 inline-block">VIEW
+                                        CODEBASE ></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="drawer-item" onclick="toggleDrawer(this)">
+                        <div class="drawer-header">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">NAV2-based Autonomous Mobile Robot</h3>
+                                <div class="flex gap-2 mt-2">
+                                    <span
+                                        class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">FAST-LIO</span>
+                                    <span
+                                        class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">NAV2</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-code-branch drawer-icon text-gray-500"></i>
+                        </div>
+                        <div class="drawer-content">
+                            <div class="px-8 pb-8 flex flex-col md:flex-row gap-6">
+                                <div class="md:w-1/3">
+                                    <div class="img-placeholder">[AMR Image]</div>
+                                </div>
+                                <div class="md:w-2/3 text-gray-300 text-base space-y-4 font-normal">
+                                    <p>Deployed FAST-LIO SLAM on custom AMR using Livox Mid-360</p>
+                                    <a href="#" class="cyber-link text-sm font-mono font-bold mt-4 inline-block">VIEW
+                                        DEMO
+                                        ></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="drawer-item" onclick="toggleDrawer(this)">
+                        <div class="drawer-header">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">Electric Motorcycle (Independent Project)</h3>
+                                <div class="flex gap-2 mt-2">
+                                    <span
+                                        class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">BLDC
+                                        Motor</span>
+                                    <span
+                                        class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">Lithium
+                                        Battery</span>
+                                    <span
+                                        class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">BMS</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-code-branch drawer-icon text-gray-500"></i>
+                        </div>
+                        <div class="drawer-content">
+                            <div class="px-8 pb-8 flex flex-col md:flex-row gap-6">
+                                <div class="md:w-1/3">
+                                    <div class="img-placeholder">[Motorcycle Image]</div>
+                                </div>
+                                <div class="md:w-2/3 text-gray-300 text-base space-y-4 font-normal">
+                                    <div class="text-gray-400 text-sm font-medium mb-2">Jun 2020 - Aug 2021</div>
+                                    <p>Designed and fabricated full-scale street-legal electric motorcycle from ground
+                                        up as sole builder - welded custom frame, hand-wound 3-phase 1kW BLDC motor,
+                                        built 2.4kW lithium battery pack with BMS achieving 100km range at 70km/h</p>
+                                    <p>Implemented regenerative braking with custom motor controller achieving 85%
+                                        efficiency and 15% range recovery; integrated digital dashboard with real-time
+                                        telemetry monitoring battery health, speed, and power consumption</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="text-center mt-12">
+                    <button onclick="openOverlay('projects')"
+                        class="group relative inline-flex items-center justify-center px-8 py-4 overflow-hidden font-mono font-medium tracking-tighter text-cyan-400 bg-gray-900 rounded-lg shadow-lg border-2 border-cyan-500/50 hover:border-cyan-400 hover:shadow-cyan-500/20 transition-all duration-300">
+                        <span
+                            class="absolute w-0 h-0 transition-all duration-500 ease-out bg-cyan-600 rounded-full group-hover:w-96 group-hover:h-96 opacity-10"></span>
+                        <span class="relative flex items-center gap-2 font-bold text-lg">
+                            More Projects <i
+                                class="fa-solid fa-arrow-right-long group-hover:translate-x-2 transition"></i>
+                        </span>
+                    </button>
+                </div>
+        </section>
+
+        <section id="techstack" class="mb-32 section-anchor">
+            <div class="section-wrapper">
+                <h2 class="text-3xl font-bold mb-10 flex items-center gap-4 text-white">
+                    <span class="section-num">03.</span>
+                    <span class="type-target" data-text="Tech Stack"></span>
+                    <span class="h-px bg-gray-700 flex-grow"></span>
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Languages -->
+                    <div class="unified-card p-6 hover:border-cyan-500/30 transition-colors duration-300">
+                        <h3 class="text-cyan-400 font-bold mb-5 font-mono text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-code"></i> // Languages
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span
+                                class="px-3 py-1.5 bg-cyan-900/10 border border-cyan-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-cyan-900/20 transition-colors">
+                                <i class="fa-brands fa-python"></i> Python
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-cyan-900/10 border border-cyan-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-cyan-900/20 transition-colors">
+                                <i class="fa-solid fa-c"></i> C++
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-cyan-900/10 border border-cyan-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-cyan-900/20 transition-colors">
+                                <i class="fa-solid fa-terminal"></i> Bash
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-cyan-900/10 border border-cyan-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-cyan-900/20 transition-colors">
+                                <i class="fa-solid fa-calculator"></i> MATLAB
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Robotics -->
+                    <div class="unified-card p-6 hover:border-purple-500/30 transition-colors duration-300">
+                        <h3 class="text-purple-400 font-bold mb-5 font-mono text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-robot"></i> // Robotics
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span
+                                class="px-3 py-1.5 bg-purple-900/10 border border-purple-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-purple-900/20 transition-colors">
+                                <i class="fa-solid fa-dharmachakra"></i> ROS2
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-purple-900/10 border border-purple-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-purple-900/20 transition-colors">
+                                <i class="fa-solid fa-cube"></i> Gazebo
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-purple-900/10 border border-purple-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-purple-900/20 transition-colors">
+                                <i class="fa-solid fa-paper-plane"></i> MAVROS
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-purple-900/10 border border-purple-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-purple-900/20 transition-colors">
+                                <i class="fa-solid fa-cloud"></i> PCL
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-purple-900/10 border border-purple-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-purple-900/20 transition-colors">
+                                <i class="fa-solid fa-location-crosshairs"></i> Lidar SLAM
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-purple-900/10 border border-purple-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-purple-900/20 transition-colors">
+                                <i class="fa-solid fa-eye"></i> Visual SLAM
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-purple-900/10 border border-purple-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-purple-900/20 transition-colors">
+                                <i class="fa-solid fa-shapes"></i> Mujoco
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-purple-900/10 border border-purple-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-purple-900/20 transition-colors">
+                                <i class="fa-solid fa-arrows-up-down-left-right"></i> MoveIt
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-purple-900/10 border border-purple-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-purple-900/20 transition-colors">
+                                <i class="fa-solid fa-route"></i> NAV2
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- ML/Vision -->
+                    <div class="unified-card p-6 hover:border-green-500/30 transition-colors duration-300">
+                        <h3 class="text-green-400 font-bold mb-5 font-mono text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-brain"></i> // ML/Vision
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span
+                                class="px-3 py-1.5 bg-green-900/10 border border-green-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-green-900/20 transition-colors">
+                                <i class="fa-brands fa-python"></i> PyTorch
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-green-900/10 border border-green-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-green-900/20 transition-colors">
+                                <i class="fa-solid fa-t"></i> TensorFlow
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-green-900/10 border border-green-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-green-900/20 transition-colors">
+                                <i class="fa-solid fa-camera"></i> OpenCV
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-green-900/10 border border-green-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-green-900/20 transition-colors">
+                                <i class="fa-solid fa-object-group"></i> YOLO
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-green-900/10 border border-green-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-green-900/20 transition-colors">
+                                <i class="fa-solid fa-mobile"></i> MobileNet
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-green-900/10 border border-green-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-green-900/20 transition-colors">
+                                <i class="fa-solid fa-id-card"></i> InsightFace
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-green-900/10 border border-green-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-green-900/20 transition-colors">
+                                <i class="fa-solid fa-fingerprint"></i> DeepPixBIS
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-green-900/10 border border-green-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-green-900/20 transition-colors">
+                                <i class="fa-solid fa-layer-group"></i> Keras
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Hardware -->
+                    <div class="unified-card p-6 hover:border-yellow-500/30 transition-colors duration-300">
+                        <h3 class="text-yellow-400 font-bold mb-5 font-mono text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-microchip"></i> // Hardware
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span
+                                class="px-3 py-1.5 bg-yellow-900/10 border border-yellow-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-yellow-900/20 transition-colors">
+                                <i class="fa-solid fa-memory"></i> Jetson Orin/Nano
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-yellow-900/10 border border-yellow-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-yellow-900/20 transition-colors">
+                                <i class="fa-solid fa-plane"></i> Pixhawk PX4
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-yellow-900/10 border border-yellow-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-yellow-900/20 transition-colors">
+                                <i class="fa-solid fa-bullseye"></i> LiDAR
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-yellow-900/10 border border-yellow-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-yellow-900/20 transition-colors">
+                                <i class="fa-solid fa-camera"></i> Intel RealSense
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-yellow-900/10 border border-yellow-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-yellow-900/20 transition-colors">
+                                <i class="fa-brands fa-raspberry-pi"></i> Raspberry Pi
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-yellow-900/10 border border-yellow-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-yellow-900/20 transition-colors">
+                                <i class="fa-solid fa-infinity"></i> Arduino
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-yellow-900/10 border border-yellow-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-yellow-900/20 transition-colors">
+                                <i class="fa-solid fa-microchip"></i> STM32
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Tools -->
+                    <div class="unified-card p-6 md:col-span-2 hover:border-pink-500/30 transition-colors duration-300">
+                        <h3 class="text-pink-400 font-bold mb-5 font-mono text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-toolbox"></i> // Tools
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-brands fa-docker"></i> Docker
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-brands fa-git-alt"></i> Git
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-solid fa-chart-line"></i> Foxglove
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-solid fa-draw-polygon"></i> MeshLab
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-solid fa-cloud"></i> CloudCompare
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-solid fa-cube"></i> Solidworks
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-solid fa-project-diagram"></i> MATLAB Simulink
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-solid fa-camera-retro"></i> Colmap
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-solid fa-vr-cardboard"></i> Isaac Sim
+                            </span>
+                            <span
+                                class="px-3 py-1.5 bg-pink-900/10 border border-pink-500/20 rounded-md text-sm text-gray-300 flex items-center gap-2 hover:bg-pink-900/20 transition-colors">
+                                <i class="fa-solid fa-tower-broadcast"></i> QGroundControl
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="fixed bottom-5 left-5 z-50 text-[10px] font-mono text-white/30 pointer-events-none select-none">
+            Designed and built by hrigved
+        </div>
+
+        <div class="h-96 w-full flex items-center justify-center pointer-events-none"></div>
+
+        <footer id="contact-footer"
+            class="relative mt-20 w-full bg-black/50 p-10 border-t border-gray-800 backdrop-blur-sm">
+            <h2 class="text-2xl font-bold mb-6 text-white text-center">Establish Connection</h2>
+            <div class="flex gap-8 mb-4 justify-center">
+                <a href="mailto:suryawanshi.h@northeastern.edu"
+                    class="text-4xl text-gray-400 hover:text-cyan-400 transition hover:scale-110"><i
+                        class="fa-solid fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/hrigved-suryawanshi/" target="_blank"
+                    class="text-4xl text-gray-400 hover:text-cyan-400 transition hover:scale-110"><i
+                        class="fa-brands fa-linkedin"></i></a>
+                <a href="https://github.com/hrigx6" target="_blank"
+                    class="text-4xl text-gray-400 hover:text-cyan-400 transition hover:scale-110"><i
+                        class="fa-brands fa-github"></i></a>
+            </div>
+        </footer>
+    </main>
+
+    <div id="projects-overlay" class="fullscreen-overlay p-10 md:p-20">
+        <div class="close-btn" onclick="closeOverlay('projects')"><i class="fa-solid fa-xmark"></i></div>
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-5xl font-bold mb-10 text-white font-mono">Extended Archive</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-900/90 border border-gray-700 p-6 rounded-lg hover:border-cyan-500 transition">
+                    <h3 class="text-xl font-bold text-white mb-2">LIO-SAM 3D Mapping</h3>
+                    <p class="text-gray-300 text-sm mb-4">Implemented LIO-SAM with Ouster OS0 LiDAR generating
+                        cm-resolution 3D maps</p>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-700 p-6 rounded-lg hover:border-cyan-500 transition">
+                    <h3 class="text-xl font-bold text-white mb-2">Battery-Aware Frontier Exploration</h3>
+                    <p class="text-gray-300 text-sm mb-4">Frontier exploration in Gazebo using A* with battery
+                        constraints (95% coverage)</p>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-700 p-6 rounded-lg hover:border-cyan-500 transition">
+                    <h3 class="text-xl font-bold text-white mb-2">Sensor Fusion (IMU + GPS)</h3>
+                    <p class="text-gray-300 text-sm mb-4">Complementary filter for VN-100 IMU with RTK-GPS integration
+                    </p>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-700 p-6 rounded-lg hover:border-cyan-500 transition">
+                    <h3 class="text-xl font-bold text-white mb-2">Monocular Visual SLAM</h3>
+                    <p class="text-gray-300 text-sm mb-4">Benchmarked VINS-Mono vs ORB-SLAM3. Developed relocalization
+                        with DBoW2</p>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-700 p-6 rounded-lg hover:border-cyan-500 transition">
+                    <h3 class="text-xl font-bold text-white mb-2">Vehicle Safety System</h3>
+                    <p class="text-gray-300 text-sm mb-4">YOLOv8 on traffic signs (96% acc) and Tesseract OCR for
+                        license plates</p>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-700 p-6 rounded-lg hover:border-cyan-500 transition">
+                    <h3 class="text-xl font-bold text-white mb-2">Low-Light Enhancement</h3>
+                    <p class="text-gray-300 text-sm mb-4">Zero-DCE in PyTorch for low-light enhancement with INT8
+                        quantization</p>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-700 p-6 rounded-lg hover:border-cyan-500 transition">
+                    <h3 class="text-xl font-bold text-white mb-2">Health Monitoring System</h3>
+                    <p class="text-gray-300 text-sm mb-4">ESP32 + SpO2/ECG. 1D-CNN for arrhythmia detection (97%
+                        accuracy)</p>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-700 p-6 rounded-lg hover:border-cyan-500 transition">
+                    <h3 class="text-xl font-bold text-white mb-2">Real-time ASL Interpreter</h3>
+                    <p class="text-gray-300 text-sm mb-4">MobileNet ASL recognition (94% accuracy) on Edge devices</p>
+                </div>
+            </div>
+            <div class="h-20"></div>
+        </div>
+    </div>
+
+    <div id="education-overlay" class="fullscreen-overlay p-10 md:p-20">
+        <div class="close-btn" onclick="closeOverlay('education')"><i class="fa-solid fa-xmark"></i></div>
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-5xl font-bold mb-12 text-white font-mono">Academic Records</h2>
+            <div class="space-y-8">
+                <div class="bg-gray-900/90 border-l-4 border-cyan-500 p-8 rounded-r-lg">
+                    <h3 class="text-2xl font-bold text-white">Northeastern University</h3>
+                    <p class="text-cyan-400 font-mono mb-2">Master of Science in Robotics</p>
+                    <p class="text-gray-400 text-sm mb-4">Boston, MA | Sep 2023 - May 2025 | GPA: 3.85/4.0</p>
+                    <p class="text-gray-300 text-base">Relevant Coursework: Pattern Recognition, Computer Vision, Mobile
+                        Robotics, Sensing & Navigation</p>
+                </div>
+                <div class="bg-gray-900/90 border-l-4 border-purple-500 p-8 rounded-r-lg">
+                    <h3 class="text-2xl font-bold text-white">University of Mumbai</h3>
+                    <p class="text-purple-400 font-mono mb-2">B.E. in Electronics & Telecommunications</p>
+                    <p class="text-gray-400 text-sm mb-4">Mumbai, India | Aug 2019 - May 2023</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="interests-overlay" class="fullscreen-overlay p-10 md:p-20 flex items-center justify-center">
+        <div class="close-btn" onclick="closeOverlay('interests')"><i class="fa-solid fa-xmark"></i></div>
+        <div class="max-w-5xl w-full">
+            <h2 class="text-5xl font-bold mb-12 text-white font-mono border-b border-gray-700 pb-4">User Config <span
+                    class="text-purple-400 text-xl align-middle">// HOBBIES</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center mb-16">
+                <div class="group">
+                    <div
+                        class="w-20 h-20 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center group-hover:bg-purple-500 transition">
+                        <i class="fa-solid fa-palette text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold">Creative Arts</h3>
+                    <p class="text-gray-400 text-sm">Painting & Sketching</p>
+                </div>
+                <div class="group">
+                    <div
+                        class="w-20 h-20 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center group-hover:bg-purple-500 transition">
+                        <i class="fa-solid fa-drum text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold">Percussion</h3>
+                    <p class="text-gray-400 text-sm">Drumming</p>
+                </div>
+                <div class="group">
+                    <div
+                        class="w-20 h-20 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center group-hover:bg-purple-500 transition">
+                        <i class="fa-solid fa-bicycle text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold">Adventure</h3>
+                    <p class="text-gray-400 text-sm">Cycling & Trekking</p>
+                </div>
+                <div class="group">
+                    <div
+                        class="w-20 h-20 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center group-hover:bg-purple-500 transition">
+                        <i class="fa-solid fa-car text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold">Automotive</h3>
+                    <p class="text-gray-400 text-sm">Cars & Motorcycles</p>
+                </div>
+                <div class="group">
+                    <div
+                        class="w-20 h-20 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center group-hover:bg-purple-500 transition">
+                        <i class="fa-solid fa-cookie-bite text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold">Culinary Arts</h3>
+                    <p class="text-gray-400 text-sm">Baking</p>
+                </div>
+            </div>
+            <div class="bg-gray-800 p-8 rounded-xl text-center border border-gray-700">
+                <i class="fa-solid fa-lightbulb text-yellow-400 text-3xl mb-4"></i>
+                <h3 class="text-xl font-bold text-white mb-2">Fun Fact</h3>
+                <p class="text-gray-300 max-w-2xl mx-auto">I was the <span class="text-cyan-400 font-bold">Robotics
+                        Lead</span> for GDSC, organizing workshops for 50+ students on Autonomous Systems</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- TYPEWRITER EFFECT ---
+        function typeWriter(element, text, speed = 50) {
+            let i = 0; element.innerHTML = ''; element.classList.add('typewriter-cursor');
+            function type() { if (i < text.length) { element.innerHTML += text.charAt(i); i++; setTimeout(type, speed); } }
+            type();
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const text = el.getAttribute('data-text');
+                    if (text && !el.classList.contains('typed')) { el.classList.add('typed'); typeWriter(el, text); }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.type-target').forEach(el => observer.observe(el));
+
+        // Drawer & Overlay Logic
+        function toggleDrawer(el) {
+            const container = el.closest('.unified-card');
+            if (container) {
+                container.querySelectorAll('.drawer-item').forEach(i => { if (i !== el) i.classList.remove('active') });
+            }
+            el.classList.toggle('active');
+        }
+        function openOverlay(id) { document.getElementById(id + '-overlay').classList.add('open'); document.body.style.overflow = 'hidden'; }
+        function closeOverlay(id) { document.getElementById(id + '-overlay').classList.remove('open'); document.body.style.overflow = 'auto'; }
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            document.getElementById('scroll-indicator').style.opacity = currentScrollY > 100 ? '0' : '0.8';
+        });
+
+
+        // --- THREE.JS ENGINE ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 300);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // --- SHADER MATERIALS ---
+        const vertexShader = `
+            attribute vec3 target; attribute vec3 colorIn; attribute vec3 colorOut;
+            uniform float uMorph; uniform float uTime;
+            varying vec3 vColor; varying float vAlpha; varying vec3 vPos;
+            void main() {
+                vec3 pos = mix(position, target, uMorph);
+                if(uMorph < 0.5) pos.y += sin(pos.x * 0.1 + uTime) * 0.1 * (1.0 - uMorph);
+                float speed = 15.0; float zOffset = mod(uTime * speed, 200.0);
+                pos.z += zOffset; if(pos.z > 50.0) pos.z -= 200.0; 
+                vPos = pos; 
+                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                gl_Position = projectionMatrix * mvPosition;
+                vColor = mix(colorOut, colorIn, uMorph);
+                gl_PointSize = (300.0 / -mvPosition.z) * 0.8;
+                vAlpha = 1.0 - smoothstep(20.0, 100.0, -pos.z); 
+            }
+        `;
+        const fragmentShader = `
+            varying vec3 vColor; varying float vAlpha; varying vec3 vPos; 
+            uniform float uTime; uniform vec2 uResolution;
+            void main() {
+                vec2 coord = gl_PointCoord - vec2(0.5);
+                if(length(coord) > 0.5) discard;
+                
+                vec2 st = gl_FragCoord.xy / uResolution;
+                float dist = distance(st, vec2(0.5));
+                float vignette = smoothstep(0.8, 0.2, dist);
+                
+                gl_FragColor = vec4(vColor, vAlpha * vignette * 0.7);
+            }
+        `;
+
+        // --- POINTS SETUP ---
+        const count = 40000;
+        const geometry = new THREE.BufferGeometry();
+        const posArr = new Float32Array(count * 3); const targetArr = new Float32Array(count * 3);
+        const colOutArr = new Float32Array(count * 3); const colInArr = new Float32Array(count * 3);
+        const colorObj = new THREE.Color();
+
+        for (let i = 0; i < count; i++) {
+            const i3 = i * 3;
+            const x = (Math.random() - 0.5) * 160; const z = (Math.random() - 0.5) * 200;
+            let yOut = Math.sin(x * 0.08) * Math.cos(z * 0.05) * 4 - 5;
+            let isPath = (Math.abs(x) < 8 && z > -20);
+            let isSky = false;
+            if (Math.random() > 0.85 && !isPath) { yOut = 8 + Math.random() * 20; isSky = true; }
+            let isObs = (Math.random() > 0.98 && Math.abs(x) > 12);
+            if (isObs) yOut += Math.random() * 15;
+
+            posArr[i3] = x; posArr[i3 + 1] = yOut; posArr[i3 + 2] = z;
+            if (isSky) { colorObj.setHex(0x22d3ee); colorObj.multiplyScalar(0.8); }
+            else if (isObs) { colorObj.setHex(0x22d3ee); }
+            else { const h = (yOut + 10) / 20; colorObj.setHSL(0.05 + h * 0.1, 0.8, 0.5); }
+            colOutArr[i3] = colorObj.r; colOutArr[i3 + 1] = colorObj.g; colOutArr[i3 + 2] = colorObj.b;
+
+            let xIn = x; let yIn = -8.0; let safeZone = Math.abs(x) < 12; let isShelf = false;
+            if (!safeZone) { if (Math.abs(x) % 30 < 5 || (Math.random() > 0.98)) { xIn = Math.round(x / 30) * 30; yIn = (Math.random() * 20) - 8; isShelf = true; } }
+            targetArr[i3] = xIn; targetArr[i3 + 1] = yIn; targetArr[i3 + 2] = z;
+            if (!isShelf && yIn < -7.0) { colorObj.setHex(0x10b981); colorObj.multiplyScalar(0.5 + Math.random() * 0.5); }
+            else { const h = (yIn + 8) / 20; colorObj.setHSL(0.15 - (h * 0.15), 1.0, 0.5); }
+            colInArr[i3] = colorObj.r; colInArr[i3 + 1] = colorObj.g; colInArr[i3 + 2] = colorObj.b;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+        geometry.setAttribute('target', new THREE.BufferAttribute(targetArr, 3));
+        geometry.setAttribute('colorOut', new THREE.BufferAttribute(colOutArr, 3));
+        geometry.setAttribute('colorIn', new THREE.BufferAttribute(colInArr, 3));
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader, fragmentShader,
+            uniforms: {
+                uTime: { value: 0 },
+                uMorph: { value: 0 },
+                uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+            },
+            transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+        });
+        const pointsMesh = new THREE.Points(geometry, material);
+        scene.add(pointsMesh);
+
+        // --- ROBOT MODEL ---
+        const robot = new THREE.Group(); scene.add(robot);
+        const drone = new THREE.Group(); robot.add(drone);
+        const agv = new THREE.Group(); robot.add(agv);
+        const cyanMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
+        const wireMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.3 });
+
+        const dBody = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1), wireMat); drone.add(dBody);
+        const dArm1 = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 0.1), wireMat); dArm1.rotation.y = Math.PI / 4; drone.add(dArm1);
+        const dArm2 = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 0.1), wireMat); dArm2.rotation.y = -Math.PI / 4; drone.add(dArm2);
+        const propGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.05, 8);
+        const props = [];
+        [1, -1].forEach(x => [1, -1].forEach(z => {
+            const p = new THREE.Mesh(propGeo, new THREE.MeshBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.2 }));
+            p.position.set(x * 1.1, 0.1, z * 1.1); props.push(p); drone.add(p);
+        }));
+        const dLidar = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.2, 8), cyanMat); dLidar.position.y = 0.3; drone.add(dLidar);
+
+        const aBody = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.6, 2.2), wireMat); agv.add(aBody);
+        const wheels = [];
+        const wGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 12);
+        [0.8, -0.8].forEach(x => [0.8, -0.8].forEach(z => {
+            const w = new THREE.Mesh(wGeo, cyanMat);
+            w.rotation.z = Math.PI / 2; w.position.set(x, -0.2, z); wheels.push(w); agv.add(w);
+        }));
+        const aLidar = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.2, 8), cyanMat); aLidar.position.y = 0.5; agv.add(aLidar);
+
+        // --- FEATURE MATCHING (SLAM) ---
+        const targets = [];
+        const targetGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        const targetMat = new THREE.MeshBasicMaterial({ color: 0x555555, wireframe: true });
+        [new THREE.Vector3(-6, 2, -30), new THREE.Vector3(8, -4, -60), new THREE.Vector3(-5, 5, -90)].forEach(pos => {
+            const t = new THREE.Mesh(targetGeo, targetMat.clone());
+            t.position.copy(pos); scene.add(t); targets.push(t);
+            const lineGeo = new THREE.BufferGeometry().setFromPoints([pos, pos]);
+            const line = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0 }));
+            scene.add(line);
+            t.userData = { line: line, originalPos: pos.clone() };
+        });
+
+        // --- MPC PATH ---
+        const pathPoints = []; const pathLen = 30;
+        for (let i = 0; i < pathLen; i++) pathPoints.push(new THREE.Vector3(0, 0, 0));
+        const pathGeo = new THREE.BufferGeometry().setFromPoints(pathPoints);
+        const pathMat = new THREE.LineBasicMaterial({ color: 0x00ff00, opacity: 0.6, transparent: true });
+        const pathLine = new THREE.Line(pathGeo, pathMat);
+        scene.add(pathLine);
+
+        // --- ANIMATION ---
+        let scrollY = 0; let lastScrollY = 0;
+        window.addEventListener('scroll', () => { scrollY = window.scrollY / (document.body.scrollHeight - window.innerHeight); });
+
+        const telX = document.getElementById('tel-x'); const telY = document.getElementById('tel-y');
+        const telZ = document.getElementById('tel-z'); const telTarget = document.getElementById('tel-target');
+        const telMode = document.getElementById('tel-mode');
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = performance.now() * 0.001;
+
+            material.uniforms.uTime.value = time;
+            let morph = Math.max(0, Math.min(1, (scrollY - 0.1) * 2.5));
+            material.uniforms.uMorph.value = morph;
+
+            robot.position.x = Math.sin(time * 0.5) * 5;
+            robot.rotation.z = -Math.cos(time * 0.5) * 0.1;
+            robot.rotation.y = Math.cos(time * 0.5) * 0.2;
+
+            const droneY = 4 + Math.sin(time * 2) * 0.2; const agvY = -6.5;
+            robot.position.y = (droneY * (1 - morph)) + (agvY * morph);
+
+            if (morph < 0.9) {
+                drone.visible = true;
+                const fold = 1.0 - Math.min(1, Math.max(0, morph * 1.5));
+                dArm1.scale.set(fold, 1, 1); dArm2.scale.set(fold, 1, 1);
+                props.forEach(p => p.rotation.y += 0.5); dLidar.rotation.y -= 0.1;
+                drone.rotation.x = 0.2;
+                telMode.innerText = morph < 0.2 ? "AERIAL_LOITER" : "TRANSITIONING"; telMode.style.color = "#a78bfa";
+            } else { drone.visible = false; }
+
+            if (morph > 0.1) {
+                agv.visible = true;
+                const deploy = -0.2 * Math.min(1, Math.max(0, (morph - 0.1) * 1.5));
+                wheels.forEach(w => { w.position.y = deploy - 0.2; w.rotation.x -= 0.2; });
+                aLidar.rotation.y -= 0.1; agv.rotation.x = 0;
+                if (morph > 0.9) { telMode.innerText = "GROUND_NAV"; telMode.style.color = "#22d3ee"; }
+            } else { agv.visible = false; }
+
+            // MPC
+            let scrollVel = Math.abs(scrollY - lastScrollY) * 100; lastScrollY = scrollY; if (scrollVel < 0.01) scrollVel = 0;
+            const positions = pathLine.geometry.attributes.position.array;
+            for (let i = 0; i < pathLen; i++) {
+                const curveX = Math.sin(time * 0.5 + i * 0.1) * 2.0;
+                positions[i * 3] = robot.position.x + (curveX * (i / pathLen));
+                positions[i * 3 + 1] = robot.position.y;
+                positions[i * 3 + 2] = robot.position.z - (i * (0.5 + scrollVel * 10.0));
+            }
+            pathLine.geometry.attributes.position.needsUpdate = true;
+
+            // SLAM Features
+            let locked = false;
+            targets.forEach(t => {
+                t.rotation.y += 0.01; t.rotation.x += 0.01;
+                t.position.z += 15.0 * 0.016; if (t.position.z > 20) t.position.z -= 100;
+                const dist = t.position.distanceTo(robot.position); const line = t.userData.line;
+                if (dist < 15 && t.position.z < robot.position.z) {
+                    t.material.color.setHex(0x00ff00); t.material.wireframe = false;
+                    const linePos = line.geometry.attributes.position.array;
+                    linePos[0] = robot.position.x; linePos[1] = robot.position.y; linePos[2] = robot.position.z;
+                    linePos[3] = t.position.x; linePos[4] = t.position.y; linePos[5] = t.position.z;
+                    line.geometry.attributes.position.needsUpdate = true; line.material.opacity = 0.5; locked = true;
+                } else {
+                    t.material.color.setHex(0x555555); t.material.wireframe = true; line.material.opacity = 0;
+                }
+            });
+            telTarget.innerText = locked ? "FEATURE_LOCKED" : "SCANNING..."; telTarget.style.color = locked ? "#4ade80" : "#fbbf24";
+
+            if (Math.random() > 0.5) { telX.innerText = robot.position.x.toFixed(2); telY.innerText = robot.position.y.toFixed(2); telZ.innerText = robot.position.z.toFixed(2); }
+
+            const camTargetY = robot.position.y + 6; const camTargetZ = robot.position.z + 15;
+            camera.position.y += (camTargetY - camera.position.y) * 0.05; camera.position.z = camTargetZ;
+            camera.lookAt(robot.position.x, robot.position.y, robot.position.z - 10);
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);
+            if (material.uniforms.uResolution) material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+        });
+        animate();
+    </script>
+</body>
+
+</html>
