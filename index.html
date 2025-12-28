@@ -406,11 +406,11 @@
 
                 <div class="flex flex-wrap gap-4">
                     <a href="#projects"
-                        class="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-cyan-400 hover:text-white transition duration-300">Explore
-                        Work</a>
+                        class="min-w-[160px] flex justify-center items-center px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-cyan-400 hover:text-white transition duration-300">Explore Work</a>
                     <a href="Resume@Hrigved_suryawanshi.pdf" target="_blank"
-                        class="px-8 py-3 border border-gray-500 bg-black/70 backdrop-blur-md text-white rounded-full hover:bg-white/10 transition">Download
-                        CV</a>
+                        class="min-w-[160px] flex justify-center items-center px-6 py-3 border border-gray-500 bg-black/70 backdrop-blur-md text-white rounded-full hover:bg-white/10 transition">Download CV</a>
+                    <a href="https://arxiv.org/abs/2512.11876" target="_blank"
+                        class="min-w-[160px] flex justify-center items-center px-6 py-3 border border-gray-500 bg-black/70 backdrop-blur-md text-white rounded-full hover:bg-white/10 transition">Thesis</a>
                 </div>
             </div>
 
@@ -534,8 +534,7 @@
                                     <ul class="list-none space-y-3">
                                         <li><span class="prompt">></span> Developed 3D photogrammetry scanner (0.1mm
                                             resolution) using Raspberry Pi</li>
-                                        <li><span class="prompt">></span> Constructed 18-inch CNC laser cutter with custom
-                                            G-code optimization</li>
+                                        <li><span class="prompt">></span> Executed Colmap-based 3D reconstruction pipelines and implemented PCL-based point cloud processing operations for high-fidelity model generation.</li>
                                     </ul>
                                 </div>
                             </div>
@@ -559,6 +558,7 @@
                         <div class="drawer-header">
                             <div>
                                 <h3 class="text-2xl font-bold text-white">Autonomous AI Drone Platform</h3>
+                                <div class="text-gray-400 text-sm font-medium mb-1">May 2024 - Present</div>
                                 <div class="flex gap-2 mt-2">
                                     <span class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">Jetson Orin</span>
                                     <span class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">RTAB-Map</span>
@@ -572,11 +572,10 @@
                                     <img src="images/drone.png" alt="Autonomous Drone" class="w-full h-48 md:h-full object-cover rounded-lg border border-gray-600 shadow-lg shadow-cyan-900/20">
                                 </div>
                                 <div class="md:w-2/3 text-gray-300 text-base space-y-4 font-normal">
-                                    <p>Architected fully autonomous UAV with Pixhawk PX4 and Jetson Orin</p>
-                                    <ul class="list-none space-y-2 text-sm text-gray-400 font-mono">
-                                        <li>- EKF 9-axis IMU Fusion</li>
-                                        <li>- Orbbec Gemini Depth Avoidance</li>
-                                        <li>- ArUco Precision Landing</li>
+                                    <ul class="list-none space-y-3">
+                                        <li><span class="prompt">></span> Architected fully autonomous UAV with Pixhawk PX4 and Jetson Orin, implementing Extended Kalman Filter for 9-axis IMU sensor fusion (gyro, accel, mag) with barometer achieving sub-degree orientation and RTK-GPS with 10cm precision</li>
+                                        <li><span class="prompt">></span> Integrated Orbbec Gemini 335L depth camera for obstacle avoidance (2m clearance, 100ms reaction) and custom PID-based human tracking maintaining 3m following distance with 0.5m position accuracy</li>
+                                        <li><span class="prompt">></span> Developed ArUco-based precision landing achieving 5cm accuracy and deployed RTAB-Map SLAM for real-time 3D mapping</li>
                                     </ul>
                                     <a href="https://www.linkedin.com/posts/hrigved-suryawanshi_%F0%9D%97%A7%F0%9D%97%B5%F0%9D%97%B2-%F0%9D%97%95%F0%9D%97%B2%F0%9D%97%B4%F0%9D%97%B6%F0%9D%97%BB%F0%9D%97%BB%F0%9D%97%B6%F0%9D%97%BB%F0%9D%97%B4-%F0%9D%97%BC%F0%9D%97%B3-%F0%9D%97%98%F0%9D%97%BB%F0%9D%97%B1-activity-7368643897926844416-2845?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEbxzPwBqddSEFtHaHb3rvCDb9M1CPuMom4" target="_blank" class="cyber-link text-sm font-mono font-bold mt-4 inline-block">VIEW POST ></a>
                                 </div>
@@ -587,10 +586,11 @@
                     <div class="drawer-item" onclick="toggleDrawer(this)">
                         <div class="drawer-header">
                             <div>
-                                <h3 class="text-2xl font-bold text-white">NAV2-based Autonomous Mobile Robot</h3>
+                                <h3 class="text-2xl font-bold text-white">UAV Trajectory Optimization</h3>
                                 <div class="flex gap-2 mt-2">
-                                    <span class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">FAST-LIO</span>
-                                    <span class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">NAV2</span>
+                                    <span class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">Python</span>
+                                    <span class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">GTSAM</span>
+                                    <span class="text-xs border border-cyan-500/30 text-cyan-400 px-2 py-1 rounded bg-cyan-900/20">RRT</span>
                                 </div>
                             </div>
                             <i class="fa-solid fa-code-branch drawer-icon text-gray-500"></i>
@@ -598,11 +598,14 @@
                         <div class="drawer-content">
                             <div class="px-8 pb-8 flex flex-col md:flex-row gap-6">
                                 <div class="md:w-1/3 flex items-center justify-center bg-black/40 rounded-lg border border-gray-700">
-                                    <img src="images/Fastlio.png" alt="FAST-LIO SLAM" class="max-w-[85%] max-h-[90%] object-contain p-2">
+                                    <img src="images/traj_optimization.png" alt="Trajectory Optimization" class="w-full h-48 md:h-full object-cover rounded-lg border border-gray-600 shadow-lg shadow-cyan-900/20">
                                 </div>
                                 <div class="md:w-2/3 text-gray-300 text-base space-y-4 font-normal flex flex-col justify-center">
-                                    <p>Deployed FAST-LIO SLAM on custom AMR using Livox Mid-360 LiDAR. Integrated with NAV2 stack for path planning in unstructured environments.</p>
-                                    <a href="#" class="cyber-link text-sm font-mono font-bold mt-4 inline-block">VIEW DEMO ></a>
+                                    <ul class="list-none space-y-3">
+                                        <li><span class="prompt">></span> Developed autonomous drone racing system combining RRT planning with nonlinear trajectory optimization (SLSQP) to navigate through hoops while avoiding obstacles, achieving 56% smoother paths than baseline.</li>
+                                        <li><span class="prompt">></span> Implemented 6-DOF physics-based dynamics with gravity compensation and terminal velocity modeling, enforcing 150+ constrained decision variables across dynamics, boundary, and collision constraints.</li>
+                                    </ul>
+                                    <a href="#" class="cyber-link text-sm font-mono font-bold mt-4 inline-block">VIEW CODE ></a>
                                 </div>
                             </div>
                         </div>
@@ -627,12 +630,10 @@
                                 </div>
                                 <div class="md:w-2/3 text-gray-300 text-base space-y-4 font-normal">
                                     <div class="text-gray-400 text-sm font-medium mb-2">Jun 2020 - Aug 2021</div>
-                                    <p>Designed and fabricated full-scale street-legal electric motorcycle from ground
-                                        up as sole builder - welded custom frame, hand-wound 3-phase 1kW BLDC motor,
-                                        built 2.4kW lithium battery pack with BMS achieving 100km range at 70km/h</p>
-                                    <p>Implemented regenerative braking with custom motor controller achieving 85%
-                                        efficiency and 15% range recovery; integrated digital dashboard with real-time
-                                        telemetry monitoring battery health, speed, and power consumption</p>
+                                    <ul class="list-none space-y-3">
+                                        <li><span class="prompt">></span> Designed and fabricated full-scale street-legal electric motorcycle from ground up as sole builder - welded custom frame, hand-wound 3-phase 1kW BLDC motor, built 2.4kW lithium battery pack with BMS achieving 100km range at 70km/h</li>
+                                        <li><span class="prompt">></span> Implemented regenerative braking with custom motor controller achieving 85% efficiency and 15% range recovery; integrated digital dashboard with real-time telemetry monitoring battery health, speed, and power consumption</li>
+                                    </ul>
                                     <a href="https://drive.google.com/file/d/1PPSihYhv7clM3poUmG6qGHMX1bWNGZiy/view" target="_blank" class="cyber-link text-sm font-mono font-bold mt-4 inline-block">VIEW DEMO ></a>
                                 </div>
                             </div>
@@ -647,7 +648,7 @@
                         <span
                             class="absolute w-0 h-0 transition-all duration-500 ease-out bg-cyan-600 rounded-full group-hover:w-96 group-hover:h-96 opacity-10"></span>
                         <span class="relative flex items-center gap-2 font-bold text-lg">
-                            More Projects <i
+                            All Projects <i
                                 class="fa-solid fa-arrow-right-long group-hover:translate-x-2 transition"></i>
                         </span>
                     </button>
@@ -769,9 +770,86 @@
     <div id="projects-overlay" class="fullscreen-overlay p-6 md:p-12">
         <div class="close-btn" onclick="closeOverlay('projects')"><i class="fa-solid fa-xmark"></i></div>
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-5xl font-bold mb-12 text-white font-mono">Extended Archive</h2>
+            <h2 class="text-5xl font-bold mb-12 text-white font-mono">All Projects</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <div class="cinematic-card group" onclick="toggleCard(this)">
+                    <div class="relative h-64 w-full">
+                        <div class="absolute inset-0 bg-cover bg-center blur-xl opacity-40" style="background-image: url('images/drone.png');"></div>
+                        <img src="images/drone.png" class="relative z-10 h-full w-full object-contain">
+                        <div class="title-overlay absolute bottom-0 z-20 w-full bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300">
+                            <h3 class="text-xl font-bold text-white">Autonomous Drone</h3>
+                        </div>
+                    </div>
+                    <div class="card-details p-6 text-sm text-gray-300">
+                        <p>Architected fully autonomous UAV with Pixhawk PX4 and Jetson Orin. Implemented 9-axis IMU fusion, ArUco precision landing, and obstacle avoidance.</p>
+                    </div>
+                </div>
+
+                <div class="cinematic-card group" onclick="toggleCard(this)">
+                    <div class="relative h-64 w-full">
+                        <div class="absolute inset-0 bg-cover bg-center blur-xl opacity-40" style="background-image: url('images/traj_optimization.png');"></div>
+                        <img src="images/traj_optimization.png" class="relative z-10 h-full w-full object-contain">
+                        <div class="title-overlay absolute bottom-0 z-20 w-full bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300">
+                            <h3 class="text-xl font-bold text-white">Trajectory Opt</h3>
+                        </div>
+                    </div>
+                    <div class="card-details p-6 text-sm text-gray-300">
+                        <p>Developed autonomous drone racing system combining RRT planning with nonlinear trajectory optimization (SLSQP) for smooth obstacle avoidance.</p>
+                    </div>
+                </div>
+
+                <div class="cinematic-card group" onclick="toggleCard(this)">
+                    <div class="relative h-64 w-full">
+                        <div class="absolute inset-0 bg-cover bg-center blur-xl opacity-40" style="background-image: url('images/bike.jpg');"></div>
+                        <img src="images/bike.jpg" class="relative z-10 h-full w-full object-contain">
+                        <div class="title-overlay absolute bottom-0 z-20 w-full bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300">
+                            <h3 class="text-xl font-bold text-white">Electric Motorcycle</h3>
+                        </div>
+                    </div>
+                    <div class="card-details p-6 text-sm text-gray-300">
+                        <p>Designed and fabricated full-scale street-legal electric motorcycle. Custom welded frame, hand-wound 1kW BLDC motor, and 2.4kW battery pack.</p>
+                    </div>
+                </div>
+                <div class="cinematic-card group" onclick="toggleCard(this)">
+                    <div class="relative h-64 w-full">
+                        <div class="absolute inset-0 bg-cover bg-center blur-xl opacity-40" style="background-image: url('images/ICP.png');"></div>
+                        <img src="images/ICP.png" class="relative z-10 h-full w-full object-contain">
+                        <div class="title-overlay absolute bottom-0 z-20 w-full bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300">
+                            <h3 class="text-xl font-bold text-white">ICP-based LiDAR SLAM</h3>
+                        </div>
+                    </div>
+                    <div class="card-details p-6 text-sm text-gray-300">
+                        <p>Built a from-scratch ICP-based LiDAR SLAM frontend with voxel-grid downsampling and KD-tree matching. Integrated pose graph optimization (GTSAM) for consistent global mapping.</p>
+                    </div>
+                </div>
+
+                <div class="cinematic-card group" onclick="toggleCard(this)">
+                    <div class="relative h-64 w-full">
+                        <div class="absolute inset-0 bg-cover bg-center blur-xl opacity-40" style="background-image: url('images/shadow_removal.png');"></div>
+                        <img src="images/shadow_removal.png" class="relative z-10 h-full w-full object-contain">
+                        <div class="title-overlay absolute bottom-0 z-20 w-full bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300">
+                            <h3 class="text-xl font-bold text-white">Shadow Removal</h3>
+                        </div>
+                    </div>
+                    <div class="card-details p-6 text-sm text-gray-300">
+                        <p>Explored shadow removal in handwritten documents using deep learning (BEDSR-Net) and intrinsic image decomposition with colorful diffuse shading analysis.</p>
+                    </div>
+                </div>
+
+                <div class="cinematic-card group" onclick="toggleCard(this)">
+                    <div class="relative h-64 w-full">
+                        <div class="absolute inset-0 bg-cover bg-center blur-xl opacity-40" style="background-image: url('images/Fastlio.png');"></div>
+                        <img src="images/Fastlio.png" class="relative z-10 h-full w-full object-contain">
+                        <div class="title-overlay absolute bottom-0 z-20 w-full bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300">
+                            <h3 class="text-xl font-bold text-white">NAV2 Mobile Robot</h3>
+                        </div>
+                    </div>
+                    <div class="card-details p-6 text-sm text-gray-300">
+                        <p>Deployed FAST-LIO SLAM on custom AMR using Livox Mid-360 LiDAR. Integrated with NAV2 stack for path planning in unstructured environments.</p>
+                    </div>
+                </div>
 
                 <div class="cinematic-card group" onclick="toggleCard(this)">
                     <div class="relative h-64 w-full">
@@ -893,7 +971,8 @@
 
                 <div class="cinematic-card group" onclick="toggleCard(this)">
                     <div class="relative h-64 w-full bg-gray-800 flex items-center justify-center">
-                        <i class="fa-solid fa-map text-5xl text-gray-600"></i>
+                        <div class="absolute inset-0 bg-cover bg-center blur-xl opacity-40" style="background-image: url('images/Fastlio.png');"></div>
+                        <img src="images/Fastlio.png" class="relative z-10 h-full w-full object-contain">
                         <div class="title-overlay absolute bottom-0 z-20 w-full bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300">
                             <h3 class="text-xl font-bold text-white">LIO-SAM Mapping</h3>
                         </div>
@@ -904,8 +983,10 @@
                 </div>
 
                 <div class="cinematic-card group" onclick="toggleCard(this)">
-                    <div class="relative h-64 w-full bg-gray-800 flex items-center justify-center">
-                        <i class="fa-solid fa-battery-half text-5xl text-gray-600"></i>
+                    <div class="relative h-64 w-full">
+                        <div class="absolute inset-0 bg-cover bg-center blur-xl opacity-40" style="background-image: url('images/Exploration.png');"></div>
+                        <img src="images/Exploration.png" class="relative z-10 h-full w-full object-contain">
+                        
                         <div class="title-overlay absolute bottom-0 z-20 w-full bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300">
                             <h3 class="text-xl font-bold text-white">Battery-Aware Nav</h3>
                         </div>
@@ -929,7 +1010,8 @@
 
                 <div class="cinematic-card group" onclick="toggleCard(this)">
                     <div class="relative h-64 w-full bg-gray-800 flex items-center justify-center">
-                        <i class="fa-solid fa-moon text-5xl text-gray-600"></i>
+                        <div class="absolute inset-0 bg-cover bg-center blur-xl opacity-40" style="background-image: url('images/image_enhancement.png');"></div>
+                        <img src="images/image_enhancement.png" class="relative z-10 h-full w-full object-contain">
                         <div class="title-overlay absolute bottom-0 z-20 w-full bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300">
                             <h3 class="text-xl font-bold text-white">Low-Light Enhance</h3>
                         </div>
@@ -1288,4 +1370,3 @@
 </body>
 
 </html>
-
